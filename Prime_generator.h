@@ -7,12 +7,11 @@
 //
 
 #include "bigint.h"
-#include "bigint.h"
 #include <iostream>
 using namespace Dodecahedron;
 
-//Define power in Bigint
-Bigint power(Bigint x, Bigint y);
+//Define integer division in Bigint
+Bigint divide(Bigint numerator, Bigint denominator);
 
 //Define module in Bigint
 Bigint module(Bigint numerator, Bigint denominator);
@@ -21,4 +20,8 @@ Bigint module(Bigint numerator, Bigint denominator);
 bool fermat_prime_test(Bigint x);
 
 //Generating a prime number with required sercurity level
-Bigint prime_generator(int security_level);
+int prime_generator(int security_level);
+
+//Generating random prime from the prime list
+int fake_prime_generator(int security_level);
+
