@@ -13,5 +13,16 @@
 #include "bigint.h"
 using namespace Dodecahedron;
 
+//return a bigint with last n digits cut
+Bigint remaining_digits(Bigint x, int n);
+
+//return the last n digits of the bigint
+unsigned long long last_n_digits(Bigint x, int n);
+
+//consumes two numbers and a code, which is ecrypted by my excryption, then decrypt the code
 void decrpte(long long d, long long n);
+
+//do the same thing as above, but require the user to type in private keys
+void decrpte(void);
+
 #endif /* decrption_hpp */

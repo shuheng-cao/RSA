@@ -12,15 +12,9 @@
 #include <fstream>
 #include "Prime_generator.h"
 #include "bigint.h"
+#include "encryption.hpp"
 using namespace Dodecahedron;
 using namespace std;
-
-//This is a dangerous function, must make should overload won't appear
-int convert(Bigint x) {
-    string str = to_string(x);
-    int temp = stoi(str);
-    return temp;
-}
 
 Bigint divide(Bigint numerator, Bigint denominator) {
     Bigint remainder = numerator;
@@ -59,43 +53,41 @@ Bigint module(Bigint numerator, Bigint denominator) {
     return remainder;
 }
 
-bool fermat_prime_test(Bigint x) {
-    if (module(x, 2)[0] == 0) {
-        return false;
-    } else {
-        for (int i = 1; i < 5; ++i) {
-            cout << i << endl;
-            srand(static_cast<unsigned int>(time(NULL)));
-            Bigint random = rand() % 100;
-            if (module( random.pow(convert(x-1)) , x) == 1) {
-                continue;
-            } else {
-                return false;
-            }
+bool fermat_prime_test(unsigned long long x) {
+    for (int i = 1; i < 5; ++i) {
+        //For debug
+        //cout << i << endl;
+        int random = rand() % 100;
+        if (power_module(random, x - 1, x) == 1) {
+            continue;
+        } else {
+            return false;
         }
     }
     return true;
 }
 
-int prime_generator(int security_level) {
-    Bigint candidate = 0;
-    while (candidate < 100) {
-        srand(static_cast<unsigned int>(time(NULL)));
-        candidate = rand() % 1000;
+unsigned long long prime_generator(int security_level) {
+    unsigned long long candidate = 0;
+    for (int i = 0; i < security_level + 2; ++i) {
+        int random = rand() % 10;
+        while (i == 0 && random == 0) { //We need the first digit to be non-zero
+            random = rand() % 10;
+        }
+        candidate = candidate * 10 + random;
     }
-    candidate = candidate.pow(security_level);
-    cout << candidate << endl;
     while (!fermat_prime_test(candidate)) {
         candidate += 1;
-        cout << candidate << endl;
+        //For debug
+        //cout << candidate << endl;
     }
-    return convert(candidate);
+    return candidate;
 }
 
 int fake_prime_generator(int security_level) {
     int candidate = 0;
     while (candidate < 100) {
-        srand(static_cast<unsigned int>(time(NULL)));
+        //srand(static_cast<unsigned int>(time(NULL)));
         candidate = rand() % 1000;
     }
     candidate += (security_level - 1) * 1000;

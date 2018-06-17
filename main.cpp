@@ -19,6 +19,12 @@
 using namespace std;
 using namespace Dodecahedron;
 
+struct keys {
+    int e;
+    long long d;
+    long long n;
+};
+
 void Extended_Euclid(long long big, long long small, long long &count_big, long long &count_small) {
     if (small == 0) {
         count_big = 1;
@@ -32,9 +38,7 @@ void Extended_Euclid(long long big, long long small, long long &count_big, long 
     }
 }
 
-
-int main(int argc, const char * argv[]) {
-    //Generate Public and Private Key
+void key_generator(struct keys &x) {
     int security = 1;
     cout << "Please enter the sercurity level you want: (1~5)" << endl;
     cin >> security;
@@ -62,13 +66,24 @@ int main(int argc, const char * argv[]) {
     if ((d*e)%phi != 1) {
         cout << "Sorry, unexpected error occurs. Please reopen the program" << endl;
     }
-    
-    cout << "What's to do next? You can do the following: " << endl;
-    cout << "1. See public key. (p)" << endl;
-    cout << "2. See secret key. (s)" << endl;
+    x.e = e;
+    x.d = d;
+    x.n = n;
+}
+
+void print_key(struct keys mykey) {
+    cout << "Public key: (" << mykey.e << ", " << mykey.n << "). Private key: (" << mykey.d << ", " << mykey.n << ")."  << endl;
+}
+
+int main(int argc, const char * argv[]) {
+    vector<keys> key_bank;
+    cout << "Welcome to RSA. You can do the following: " << endl;
+    cout << "1. Generate random prime numbers for fun. (g)" << endl;
+    cout << "2. Generate keys. (k)" << endl;
     cout << "3. Encrpyion. (e)" << endl;
     cout << "4. Decrption. (d)" << endl;
-    cout << "5. Quit. (q)" << endl;
+    cout << "5. Check my key bank. (c)" << endl;
+    cout << "6. Quit. (q)" << endl;
     bool state = true;
     while (state) {
         char c;
@@ -76,19 +91,37 @@ int main(int argc, const char * argv[]) {
         cerr << "Command?" << endl;
         cin >> c;
         switch(c) {
-            case 'p':
-                cout << "Your public key is: " << "(" << e << "," << n << ")" << endl;
+            case 'g': {
+                cout << "What security level number do you want? " << endl;
+                cout << "Level 1: 3 digits" << endl
+                    << "Level 2: 4 digits" << endl
+                    << "Level 3: 5 digits" << endl
+                    << "Level 4: 6 digits" << endl
+                    << "Level 5: 7 digits" << endl;
+                int temp;
+                cin >> temp;
+                cout << "Here is your prime: " << prime_generator(temp) << endl;
                 break;
-            case 's':
-                cout << "Your secret key is: " << "(" << d << "," << n << ")" << endl;
+            }
+            case 'k': {
+                struct keys temp;
+                key_generator(temp);
+                key_bank.push_back(temp);
+                cout << "Your key have been stored in the " << key_bank.size() << "th position" << endl;
                 break;
+            }
             case 'e': {
-                cout << "Whether or not use the key just generate? (y/n)" << endl;
+                cout << "Whether or not use the key from key bank? (y/n)" << endl;
                 cin >> which;
                 if (which == 'y') {
+                    cout << "Which key do you want to use? Type in the key number: " << endl;
+                    int x; cin >> x;
+                    if (x >= key_bank.size()) {
+                        cout << "Error: key does not exists" << endl;
+                    }
                     string str;
                     getline(cin, str);
-                    encrpte(e, n);
+                    encrpte(key_bank[x - 1].e, key_bank[x - 1].n);
                 } else {
                     string str;
                     getline(cin, str);
@@ -96,9 +129,37 @@ int main(int argc, const char * argv[]) {
                 }
                 break;
             }
-            case 'd':
-                //decrpte(d, n);
+            case 'd': {
+                cout << "Whether or not use the key from key bank? (y/n)" << endl;
+                cin >> which;
+                if (which == 'y') {
+                    cout << "Which key do you want to use? Type in the key number: " << endl;
+                    int x; cin >> x;
+                    if (x >= key_bank.size()) {
+                        cout << "Error: key does not exists" << endl;
+                    }
+                    string str;
+                    getline(cin, str);
+                    decrpte(key_bank[x - 1].d, key_bank[x - 1].n);
+                } else {
+                    decrpte();
+                }
                 break;
+            }
+            case 'c': {
+                cout << "Print all keys? (y/n)" << endl;cin >> which;
+                if (which == 'y') {
+                    for (int i = 0; i < key_bank.size(); ++i) {
+                        cout << i + 1 << "th key: ";
+                        print_key(key_bank[i]);
+                    }
+                } else {
+                    cout << "Which key do you want? Type in the key number: " << endl;
+                    int x; cin >> x;
+                    print_key(key_bank[x - 1]);
+                }
+                break;
+            }
             case 'q':
                 state = false;
                 break;
@@ -108,3 +169,8 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
+
+
+
+
+

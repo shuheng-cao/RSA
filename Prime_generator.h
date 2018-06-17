@@ -17,10 +17,10 @@ Bigint divide(Bigint numerator, Bigint denominator);
 Bigint module(Bigint numerator, Bigint denominator);
 
 //Testing whether an larger integer is prime or not using Fermat primality test
-bool fermat_prime_test(Bigint x);
+bool fermat_prime_test(unsigned long long x);
 
 //Generating a prime number with required sercurity level
-int prime_generator(int security_level);
+unsigned long long prime_generator(int security_level);
 
 //Generating random prime from the prime list
 int fake_prime_generator(int security_level);
