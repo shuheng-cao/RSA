@@ -12,9 +12,11 @@ class Bigint
 private:
     std::vector<int> number;
     bool positive;
+    //What the point of base and skip?
     int base;
     unsigned int skip;
     static const int default_base=1000000000;
+    //The basis means we can have at most 9 digits, which is within the range of normal integer
 
 public:
     //Constructors
@@ -69,7 +71,7 @@ public:
     int trailing_zeros() const;
 private:
     int segment_length(int) const;
-    Bigint pow(int const &, std::map<int, Bigint> &);
+    Bigint pow(int const &, std::map<int, Bigint> &);//This is the helper for pow
     int compare(Bigint const &) const; //0 a == b, -1 a < b, 1 a > b
 };
 

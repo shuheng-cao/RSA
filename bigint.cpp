@@ -46,17 +46,17 @@ Bigint::Bigint(std::string stringInteger)
     while (true) {
         if (size <= 0) break;
         if (!positive && size <= 1) break;
-
+        //Q: what the use of length and num?
         int length = 0;
         int num = 0;
         int prefix = 1;
-        for (int i(size - 1); i >= 0 && i >= size - 9; --i) {
-            if (stringInteger[i] < '0' || stringInteger[i] > '9') break;
+        for (int i(size - 1); i >= 0 && i >= size - 9; --i) {//The condition for the while loop is a little bit weird
+            if (stringInteger[i] < '0' || stringInteger[i] > '9') break;//To check the '-'?
             num += (stringInteger[i] - '0') * prefix;
-            prefix *= 10;
+            prefix *= 10;//prefix is used to represent the digit
             ++length;
         }
-        number.push_back(num);
+        number.push_back(num);//We store the value in reverse order
         size -= length;
     }
 }
@@ -65,7 +65,7 @@ Bigint::Bigint(std::string stringInteger)
 Bigint Bigint::operator+(Bigint const &b) const
 {
     Bigint c = *this;
-    c += b;
+    c += b;//We can use this because the order of our impliment for member function doesn't matter
 
     return c;
 }
@@ -73,14 +73,14 @@ Bigint Bigint::operator+(Bigint const &b) const
 Bigint &Bigint::operator+=(Bigint const &b)
 {
     if (!b.positive) {
-        return *this -= b;
+        return *this -= b;//Again, the order doesn't matter
     }
     std::vector<int>::iterator
         it1 = number.begin();
     std::vector<int>::const_iterator
         it2 = b.number.begin();
     int sum = 0;
-    while (it1 != number.end() || it2 != b.number.end()) {
+    while (it1 != number.end() || it2 != b.number.end()) {//We store number in reverse order
         if (it1 != number.end()) {
             sum += *it1;
         } else {
@@ -93,9 +93,9 @@ Bigint &Bigint::operator+=(Bigint const &b)
         }
         *it1 = sum % base;
         ++it1;
-        sum /= base;
+        sum /= base;//Those digits that overflows are stored here
     }
-    if (sum) number.push_back(1);
+    if (sum) number.push_back(1);//If the sum excess the original capacity, we push them back
 
     return *this;
 }
@@ -112,7 +112,7 @@ Bigint &Bigint::operator+=(long long b)
 {
     std::vector<int>::iterator it = number.begin();
     if (skip > number.size()) {
-        number.insert(number.end(), skip - number.size(), 0);
+        number.insert(number.end(), skip - number.size(), 0);//Did get this
     }
     it += skip;
     bool initial_flag=true;
@@ -121,7 +121,7 @@ Bigint &Bigint::operator+=(long long b)
         if (it != number.end()) {
             *it += b % base;
             b /= base;
-            b += *it / base;
+            b += *it / base;//plus the overflow digits
             *it %= base;
             ++it;
         } else {
@@ -191,11 +191,13 @@ Bigint Bigint::operator*(Bigint const &b)
     for (it1 = number.begin(); it1 != number.end(); ++it1) {
         for (it2 = b.number.begin(); it2 != b.number.end(); ++it2) {
             c.skip = (unsigned int) (it1 - number.begin()) + (it2 - b.number.begin()); //TODO
+            //WHAT THE HELL DOES SKIP DOOOOOOO???
+            //According to the code, skip seems like the shift of digits
             c += (long long) (*it1) * (*it2);
         }
     }
     c.skip = 0;
-
+    //set it back to zero?? When will we set skip non-zero?
     return c;
 }
 
@@ -232,28 +234,36 @@ Bigint &Bigint::operator*=(int const &b)
 
 
 //Power
-Bigint Bigint::pow(int const &power, std::map<int, Bigint> &lookup)
+Bigint Bigint::pow(int const &power, std::map<int, Bigint> &lookup)//What is lookup?? Why we use map here?
+    //We use the reference of map here, which means we are actually changing the meaning of map
 {
     if (power == 1) return *this;
-    if (lookup.count(power)) return lookup[power];
+    if (lookup.count(power)) return lookup[power];//What the hell are we returning?!
 
     int closestPower = 1;
-    while (closestPower < power) closestPower <<= 1;
-    closestPower >>= 1;
+    while (closestPower < power) closestPower <<= 1;//What the f**k is <<= sign?? This is the assign?? This is bit shift, you idiot
+    
+    //At this point, closestPower is greater than or equal to power, but it's the closest 2^n power to the desired power
+    
+    closestPower >>= 1; //We cut closest power into half
 
     if (power == closestPower) lookup[power] = pow(power / 2, lookup) * pow(power / 2, lookup);
+    //We are using recursion?? You must be kidding me
+    //So, bit shift is indeed important?
     else lookup[power] = pow(closestPower, lookup) * pow(power - closestPower, lookup);
-
+    //If we calculate the closestPower first, all the power can be decomposite into what we have already calculated
     return lookup[power];
 }
 
 Bigint &Bigint::pow(int const &power)
 {
-    std::map<int, Bigint> lookup;
+    std::map<int, Bigint> lookup;//Here is a brand new lookup
     if (power % 2 == 0 && !positive) {
-        positive = true;
+        positive = true;//Careful about sign
     }
     *this = pow(power, lookup);
+    //Here, the lookup is actually this->lookup or not?
+    //No, here we cactually have this->pow(power, lookup)
 
     return *this;
 }
@@ -317,7 +327,7 @@ Bigint Bigint::operator=(const long long &a)
     number.clear();
     long long t = a;
     do {
-        number.push_back((int) (t % base));
+        number.push_back((int) (t % base));//I didn't get the point of base and I think I never will
         t /= base;
     } while (t != 0);
 
